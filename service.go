@@ -9,10 +9,10 @@ import (
 )
 
 type SocketService struct {
-	onMessage    func(*SocketService, string, *Message)
-	onConnect    func(*Conn)
-	onDisconnect func(*Conn, error)
-	conns        *sync.Map
+	onMessage    func(*Session, *Message)
+	onConnect    func(*Session)
+	onDisconnect func(*Session, error)
+	sessions     *sync.Map
 	hbInterval   time.Duration
 	hbTimeout    time.Duration
 	laddr        string
@@ -30,7 +30,7 @@ func NewSocketService(laddr string) (*SocketService, error) {
 	}
 
 	s := &SocketService{
-		conns:      &sync.Map{},
+		sessions:   &sync.Map{},
 		stopCh:     make(chan error),
 		hbInterval: 0 * time.Second,
 		hbTimeout:  0 * time.Second,
@@ -42,15 +42,15 @@ func NewSocketService(laddr string) (*SocketService, error) {
 	return s, nil
 }
 
-func (s *SocketService) RegOnMessageHandler(handler func(*SocketService, string, *Message)) {
+func (s *SocketService) RegOnMessageHandler(handler func(*Session, *Message)) {
 	s.onMessage = handler
 }
 
-func (s *SocketService) RegOnConnectHandler(handler func(*Conn)) {
+func (s *SocketService) RegOnConnectHandler(handler func(*Session)) {
 	s.onConnect = handler
 }
 
-func (s *SocketService) RegOnDisconnectHandler(handler func(*Conn, error)) {
+func (s *SocketService) RegOnDisconnectHandler(handler func(*Session, error)) {
 	s.onDisconnect = handler
 }
 
@@ -86,26 +86,26 @@ func (s *SocketService) acceptHandler(ctx context.Context) {
 
 		go s.connectHandler(ctx, c)
 	}
-
 }
 
 func (s *SocketService) connectHandler(ctx context.Context, c net.Conn) {
 	conn := NewConn(c, s.hbInterval, s.hbTimeout)
-	s.conns.Store(conn.GetUUID(), conn)
+	session := NewSession(conn)
+	s.sessions.Store(session.GetSessionID(), session)
 
 	connctx, cancel := context.WithCancel(ctx)
 
 	defer func() {
 		cancel()
 		conn.Close()
-		s.conns.Delete(conn.GetUUID())
+		s.sessions.Delete(session.GetSessionID())
 	}()
 
 	go conn.readCoroutine(connctx)
 	go conn.writeCoroutine(connctx)
 
 	if s.onConnect != nil {
-		s.onConnect(conn)
+		s.onConnect(session)
 	}
 
 	for {
@@ -113,13 +113,13 @@ func (s *SocketService) connectHandler(ctx context.Context, c net.Conn) {
 		case err := <-conn.done:
 
 			if s.onDisconnect != nil {
-				s.onDisconnect(conn, err)
+				s.onDisconnect(session, err)
 			}
 			return
 
-		case msgHolder := <-conn.messageCh:
+		case msg := <-conn.messageCh:
 			if s.onMessage != nil {
-				s.onMessage(s, msgHolder.uuid, msgHolder.message)
+				s.onMessage(session, msg)
 			}
 		}
 	}
@@ -146,7 +146,7 @@ func (s *SocketService) SetHeartBeat(hbInterval time.Duration, hbTimeout time.Du
 
 func (s *SocketService) GetConnsCount() int {
 	var count int
-	s.conns.Range(func(k, v interface{}) bool {
+	s.sessions.Range(func(k, v interface{}) bool {
 		count++
 		return true
 	})
@@ -154,12 +154,12 @@ func (s *SocketService) GetConnsCount() int {
 }
 
 // 发送消息
-func (s *SocketService) Unicast(uuid string, msg *Message) {
-	v, ok := s.conns.Load(uuid)
+func (s *SocketService) Unicast(sid string, msg *Message) {
+	v, ok := s.sessions.Load(sid)
 	if ok {
-		err := v.(*Conn).SendMessage(msg)
+		session := v.(*Session)
+		err := session.GetConn().SendMessage(msg)
 		if err != nil {
-			// log.Println(err)
 			return
 		}
 	}
@@ -167,9 +167,9 @@ func (s *SocketService) Unicast(uuid string, msg *Message) {
 
 // 广播消息
 func (s *SocketService) Broadcast(msg *Message) {
-	s.conns.Range(func(k, v interface{}) bool {
-		c := v.(*Conn)
-		if err := c.SendMessage(msg); err != nil {
+	s.sessions.Range(func(k, v interface{}) bool {
+		s := v.(*Session)
+		if err := s.GetConn().SendMessage(msg); err != nil {
 			// log.Println(err)
 		}
 		return true

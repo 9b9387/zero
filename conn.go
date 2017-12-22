@@ -7,18 +7,16 @@ import (
 	"io"
 	"net"
 	"time"
-
-	uuid "github.com/satori/go.uuid"
 )
 
 type Conn struct {
-	uuid       string
+	sid        string
 	rawConn    net.Conn
 	sendCh     chan []byte
 	done       chan error
 	hbTimer    *time.Timer
 	name       string
-	messageCh  chan MessageHolder
+	messageCh  chan *Message
 	hbInterval time.Duration
 	hbTimeout  time.Duration
 }
@@ -27,22 +25,18 @@ func (c *Conn) GetName() string {
 	return c.name
 }
 
-func (c *Conn) GetUUID() string {
-	return c.uuid
-}
-
 func NewConn(c net.Conn, hbInterval time.Duration, hbTimeout time.Duration) *Conn {
 	conn := &Conn{
 		rawConn:    c,
 		sendCh:     make(chan []byte, 100),
 		done:       make(chan error),
-		messageCh:  make(chan MessageHolder, 100),
+		messageCh:  make(chan *Message, 100),
 		hbInterval: hbInterval,
 		hbTimeout:  hbTimeout,
 	}
 
 	conn.name = c.RemoteAddr().String()
-	conn.uuid = uuid.NewV4().String()
+	// conn.uuid = uuid.NewV4().String()
 	conn.hbTimer = time.NewTimer(conn.hbInterval)
 
 	if conn.hbInterval == 0 {
@@ -50,6 +44,10 @@ func NewConn(c net.Conn, hbInterval time.Duration, hbTimeout time.Duration) *Con
 	}
 
 	return conn
+}
+
+func (c *Conn) SetSessionID(sid string) {
+	c.sid = sid
 }
 
 func (c *Conn) Close() {
@@ -149,10 +147,8 @@ func (c *Conn) readCoroutine(ctx context.Context) {
 				continue
 			}
 
-			c.messageCh <- MessageHolder{
-				message: msg,
-				uuid:    c.uuid,
-			}
+			c.messageCh <- msg
+
 		}
 	}
 }
