@@ -12,11 +12,13 @@ func main() {
 		return
 	}
 
-	ss.SetHeartBeat(5*time.Second, 30*time.Second)
+	// set Heartbeat
+	//ss.SetHeartBeat(5*time.Second, 30*time.Second)
 
-	ss.RegOnMessageHandler(HandleMessage)
-	ss.RegOnConnectHandler(HandleConnect)
-	ss.RegOnDisconnectHandler(HandleDisconnect)
+	// net event
+	//ss.RegOnMessageHandler(HandleMessage)
+	//ss.RegOnConnectHandler(HandleConnect)
+	//ss.RegOnDisconnectHandler(HandleDisconnect)
 
 	ss.Serv()
 }
