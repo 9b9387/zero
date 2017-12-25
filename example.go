@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
-	"os"
 	"time"
 
 	"./zero"
@@ -47,13 +45,11 @@ func NewClientConnect() {
 	host := "127.0.0.1:18787"
 	tcpAddr, err := net.ResolveTCPAddr("tcp", host)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
 		return
 	}
 
 	_, err = net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
 		return
 	}
 }
