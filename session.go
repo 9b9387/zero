@@ -26,7 +26,7 @@ func (s *Session) GetSessionID() string {
 	return s.sID
 }
 
-func (s *Session) SetUserID(uid string) {
+func (s *Session) BindUserID(uid string) {
 	s.uID = uid
 }
 
