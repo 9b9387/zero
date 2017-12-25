@@ -5,10 +5,10 @@ A simple TCP Server with heartbeat
 
 ```
 func main() {
-	host := "127.0.0.1:18787"
+ 	host := "127.0.0.1:18787"
 
-	ss, err := zero.NewSocketService(host)
-	if err != nil {
+ 	ss, err := zero.NewSocketService(host)
+    if err != nil {
 		return
 	}
 
@@ -18,9 +18,6 @@ func main() {
 	ss.RegOnConnectHandler(HandleConnect)
 	ss.RegOnDisconnectHandler(HandleDisconnect)
 
-	log.Println("server running on " + host)
-
-	go NewClientConnect()
 	ss.Serv()
 }
 
