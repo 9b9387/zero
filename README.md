@@ -1,6 +1,12 @@
 # zero
 A simple TCP Server with heartbeat
 
+## Requirements
+
+```
+$ go get github.com/satori/go.uuid
+```
+
 ## Usage
 
 ```
