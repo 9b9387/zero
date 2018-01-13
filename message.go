@@ -3,6 +3,7 @@ package zero
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"hash/adler32"
 )
 
@@ -54,4 +55,8 @@ func (msg *Message) calcChecksum() uint32 {
 
 	checksum := adler32.Checksum(data.Bytes())
 	return checksum
+}
+
+func (msg *Message) String() string {
+	return fmt.Sprintf("Size=%d ID=%d DataLen=%d Checksum=%d", msg.msgSize, msg.GetID(), len(msg.GetData()), msg.checksum)
 }
