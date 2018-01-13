@@ -1,7 +1,7 @@
 package zero
 
 const (
-	// STUnknown Unkown
+	// STUnknown Unknown
 	STUnknown = iota
 	// STInited Inited
 	STInited
