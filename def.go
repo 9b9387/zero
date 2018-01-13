@@ -1,8 +1,8 @@
 package zero
 
 const (
-	// STUnkown Unkown
-	STUnkown = iota
+	// STUnknown Unkown
+	STUnknown = iota
 	// STInited Inited
 	STInited
 	// STRunning Running
