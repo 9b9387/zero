@@ -7,6 +7,7 @@ import (
 	"hash/adler32"
 )
 
+// Message struct
 type Message struct {
 	msgSize  int32
 	msgID    int32
@@ -14,6 +15,7 @@ type Message struct {
 	checksum uint32
 }
 
+// NewMessage create a new message
 func NewMessage(msgID int32, data []byte) *Message {
 	msg := &Message{
 		msgSize: int32(len(data)) + 4 + 4,
@@ -25,14 +27,17 @@ func NewMessage(msgID int32, data []byte) *Message {
 	return msg
 }
 
+// GetData get message data
 func (msg *Message) GetData() []byte {
 	return msg.data
 }
 
+// GetID get message ID
 func (msg *Message) GetID() int32 {
 	return msg.msgID
 }
 
+// Verify verify checksum
 func (msg *Message) Verify() bool {
 	return msg.checksum == msg.calcChecksum()
 }

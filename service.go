@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// SocketService struct
 type SocketService struct {
 	onMessage    func(*Session, *Message)
 	onConnect    func(*Session)
@@ -21,6 +22,7 @@ type SocketService struct {
 	stopCh       chan error
 }
 
+// NewSocketService create a new socket service
 func NewSocketService(laddr string) (*SocketService, error) {
 
 	l, err := net.Listen("tcp", laddr)
@@ -35,32 +37,36 @@ func NewSocketService(laddr string) (*SocketService, error) {
 		hbInterval: 0 * time.Second,
 		hbTimeout:  0 * time.Second,
 		laddr:      laddr,
-		status:     SERVER_ST_INITED,
+		status:     STInited,
 		listener:   l,
 	}
 
 	return s, nil
 }
 
+// RegOnMessageHandler register message handler
 func (s *SocketService) RegOnMessageHandler(handler func(*Session, *Message)) {
 	s.onMessage = handler
 }
 
+// RegOnConnectHandler register connect handler
 func (s *SocketService) RegOnConnectHandler(handler func(*Session)) {
 	s.onConnect = handler
 }
 
+// RegOnDisconnectHandler register disconnect handler
 func (s *SocketService) RegOnDisconnectHandler(handler func(*Session, error)) {
 	s.onDisconnect = handler
 }
 
+// Serv Start socket service
 func (s *SocketService) Serv() {
 
-	s.status = SERVER_ST_RUNNING
+	s.status = STRunning
 	ctx, cancel := context.WithCancel(context.Background())
 
 	defer func() {
-		s.status = SERVER_ST_STOP
+		s.status = STStop
 		cancel()
 		s.listener.Close()
 	}()
@@ -125,17 +131,20 @@ func (s *SocketService) connectHandler(ctx context.Context, c net.Conn) {
 	}
 }
 
+// GetStatus get socket service status
 func (s *SocketService) GetStatus() int {
 	return s.status
 }
 
+// Stop stop socket service with reason
 func (s *SocketService) Stop(reason string) {
 	s.stopCh <- errors.New(reason)
 }
 
+// SetHeartBeat set heart beat
 func (s *SocketService) SetHeartBeat(hbInterval time.Duration, hbTimeout time.Duration) error {
-	if s.status == SERVER_ST_RUNNING {
-		return errors.New("Can't set heart beat on service running.")
+	if s.status == STRunning {
+		return errors.New("Can't set heart beat on service running")
 	}
 
 	s.hbInterval = hbInterval
@@ -144,6 +153,7 @@ func (s *SocketService) SetHeartBeat(hbInterval time.Duration, hbTimeout time.Du
 	return nil
 }
 
+// GetConnsCount get connect count
 func (s *SocketService) GetConnsCount() int {
 	var count int
 	s.sessions.Range(func(k, v interface{}) bool {
@@ -153,7 +163,7 @@ func (s *SocketService) GetConnsCount() int {
 	return count
 }
 
-// 发送消息
+// Unicast Unicast with session ID
 func (s *SocketService) Unicast(sid string, msg *Message) {
 	v, ok := s.sessions.Load(sid)
 	if ok {
@@ -165,7 +175,7 @@ func (s *SocketService) Unicast(sid string, msg *Message) {
 	}
 }
 
-// 广播消息
+// Broadcast Broadcast to all connections
 func (s *SocketService) Broadcast(msg *Message) {
 	s.sessions.Range(func(k, v interface{}) bool {
 		s := v.(*Session)

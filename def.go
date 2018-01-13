@@ -1,12 +1,17 @@
 package zero
 
 const (
-	SERVER_ST_UNKNOW = iota
-	SERVER_ST_INITED
-	SERVER_ST_RUNNING
-	SERVER_ST_STOP
+	// STUnkown Unkown
+	STUnkown = iota
+	// STInited Inited
+	STInited
+	// STRunning Running
+	STRunning
+	// STStop Stop
+	STStop
 )
 
 const (
-	MSGID_HEARTBEAT = iota
+	// MsgHeartbeat heartbeat
+	MsgHeartbeat = iota
 )

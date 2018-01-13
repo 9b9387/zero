@@ -6,6 +6,7 @@ import (
 	"errors"
 )
 
+// Encode from Message to []byte
 func Encode(msg *Message) ([]byte, error) {
 	buffer := new(bytes.Buffer)
 
@@ -29,6 +30,7 @@ func Encode(msg *Message) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
+// Decode from []byte to Message
 func Decode(data []byte) (*Message, error) {
 	bufReader := bytes.NewReader(data)
 
@@ -65,5 +67,5 @@ func Decode(data []byte) (*Message, error) {
 		return message, nil
 	}
 
-	return nil, errors.New("checksum error.")
+	return nil, errors.New("checksum error")
 }

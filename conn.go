@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Conn wrap net.Conn
 type Conn struct {
 	sid        string
 	rawConn    net.Conn
@@ -21,10 +22,12 @@ type Conn struct {
 	hbTimeout  time.Duration
 }
 
+// GetName Get conn name
 func (c *Conn) GetName() string {
 	return c.name
 }
 
+// NewConn create new conn
 func NewConn(c net.Conn, hbInterval time.Duration, hbTimeout time.Duration) *Conn {
 	conn := &Conn{
 		rawConn:    c,
@@ -45,11 +48,13 @@ func NewConn(c net.Conn, hbInterval time.Duration, hbTimeout time.Duration) *Con
 	return conn
 }
 
+// Close close connection
 func (c *Conn) Close() {
 	c.hbTimer.Stop()
 	c.rawConn.Close()
 }
 
+// SendMessage send message
 func (c *Conn) SendMessage(msg *Message) error {
 	pkg, err := Encode(msg)
 	if err != nil {
@@ -60,6 +65,7 @@ func (c *Conn) SendMessage(msg *Message) error {
 	return nil
 }
 
+// writeCoroutine write coroutine
 func (c *Conn) writeCoroutine(ctx context.Context) {
 	hbData := make([]byte, 0)
 
@@ -79,12 +85,13 @@ func (c *Conn) writeCoroutine(ctx context.Context) {
 			}
 
 		case <-c.hbTimer.C:
-			hbMessage := NewMessage(MSGID_HEARTBEAT, hbData)
+			hbMessage := NewMessage(MsgHeartbeat, hbData)
 			c.SendMessage(hbMessage)
 		}
 	}
 }
 
+// readCoroutine read coroutine
 func (c *Conn) readCoroutine(ctx context.Context) {
 
 	for {
@@ -138,7 +145,7 @@ func (c *Conn) readCoroutine(ctx context.Context) {
 				c.hbTimer.Reset(c.hbInterval)
 			}
 
-			if msg.GetID() == MSGID_HEARTBEAT {
+			if msg.GetID() == MsgHeartbeat {
 				continue
 			}
 
