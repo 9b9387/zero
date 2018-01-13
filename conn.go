@@ -36,7 +36,6 @@ func NewConn(c net.Conn, hbInterval time.Duration, hbTimeout time.Duration) *Con
 	}
 
 	conn.name = c.RemoteAddr().String()
-	// conn.uuid = uuid.NewV4().String()
 	conn.hbTimer = time.NewTimer(conn.hbInterval)
 
 	if conn.hbInterval == 0 {
@@ -44,10 +43,6 @@ func NewConn(c net.Conn, hbInterval time.Duration, hbTimeout time.Duration) *Con
 	}
 
 	return conn
-}
-
-func (c *Conn) SetSessionID(sid string) {
-	c.sid = sid
 }
 
 func (c *Conn) Close() {

@@ -1,10 +1,5 @@
 package zero
 
-// type MessageHolder struct {
-// 	uuid    string
-// 	message *Message
-// }
-
 const (
 	SERVER_ST_UNKNOW = iota
 	SERVER_ST_INITED
