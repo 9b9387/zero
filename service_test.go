@@ -23,7 +23,7 @@ func TestService(t *testing.T) {
 
 	go NewClientConnect()
 
-	timer := time.NewTimer(time.Second * 2)
+	timer := time.NewTimer(time.Second * 1)
 	go func() {
 		<-timer.C
 		ss.Stop("stop service")
