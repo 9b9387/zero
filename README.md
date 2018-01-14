@@ -2,6 +2,8 @@
 A Lightweight Socket Service with heartbeat, Can be easily used in TCP server development.
 
 [![Build Status](https://api.travis-ci.org/9b9387/zero.svg?branch=master)](https://travis-ci.org/9b9387/zero)
+[![Go Report Card](https://goreportcard.com/badge/github.com/9b9387/zero)](https://goreportcard.com/report/github.com/9b9387/zero)
+[![GoDoc](https://godoc.org/github.com/9b9387/zero?status.png)](https://godoc.org/github.com/9b9387/zero)
 
 Wiki Page [https://github.com/9b9387/zero/wiki](https://github.com/9b9387/zero/wiki)
 
