@@ -17,9 +17,9 @@ func TestService(t *testing.T) {
 
 	// ss.SetHeartBeat(5*time.Second, 30*time.Second)
 
-	ss.RegOnMessageHandler(HandleMessage)
-	ss.RegOnConnectHandler(HandleConnect)
-	ss.RegOnDisconnectHandler(HandleDisconnect)
+	ss.RegMessageHandler(HandleMessage)
+	ss.RegConnectHandler(HandleConnect)
+	ss.RegDisconnectHandler(HandleDisconnect)
 
 	go NewClientConnect()
 

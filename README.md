@@ -30,9 +30,9 @@ func main() {
 	ss.SetHeartBeat(5*time.Second, 30*time.Second)
 
 	// net event
-	ss.RegOnMessageHandler(HandleMessage)
-	ss.RegOnConnectHandler(HandleConnect)
-	ss.RegOnDisconnectHandler(HandleDisconnect)
+	ss.RegMessageHandler(HandleMessage)
+	ss.RegConnectHandler(HandleConnect)
+	ss.RegDisconnectHandler(HandleDisconnect)
 
 	ss.Serv()
 }

@@ -150,7 +150,6 @@ func (c *Conn) readCoroutine(ctx context.Context) {
 			}
 
 			c.messageCh <- msg
-
 		}
 	}
 }

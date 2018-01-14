@@ -44,18 +44,18 @@ func NewSocketService(laddr string) (*SocketService, error) {
 	return s, nil
 }
 
-// RegOnMessageHandler register message handler
-func (s *SocketService) RegOnMessageHandler(handler func(*Session, *Message)) {
+// RegMessageHandler register message handler
+func (s *SocketService) RegMessageHandler(handler func(*Session, *Message)) {
 	s.onMessage = handler
 }
 
-// RegOnConnectHandler register connect handler
-func (s *SocketService) RegOnConnectHandler(handler func(*Session)) {
+// RegConnectHandler register connect handler
+func (s *SocketService) RegConnectHandler(handler func(*Session)) {
 	s.onConnect = handler
 }
 
-// RegOnDisconnectHandler register disconnect handler
-func (s *SocketService) RegOnDisconnectHandler(handler func(*Session, error)) {
+// RegDisconnectHandler register disconnect handler
+func (s *SocketService) RegDisconnectHandler(handler func(*Session, error)) {
 	s.onDisconnect = handler
 }
 
