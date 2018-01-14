@@ -15,7 +15,7 @@ Go version: 1.9.x or later
 go get -u github.com/9b9387/zero
 ```
 
-```
+```go
 import "github.com/9b9387/zero"
 
 func main() {
