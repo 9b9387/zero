@@ -41,4 +41,4 @@ func main() {
 
 
 ```
-Exmaple Code: [https://github.com/9b9387/zero/blob/master/service_test.go](https://github.com/9b9387/zero/blob/master/service_test.go)
+Example Code: [https://github.com/9b9387/zero/blob/master/service_test.go](https://github.com/9b9387/zero/blob/master/service_test.go)
