@@ -87,6 +87,10 @@ func (c *Conn) writeCoroutine(ctx context.Context) {
 		case <-c.hbTimer.C:
 			hbMessage := NewMessage(MsgHeartbeat, hbData)
 			c.SendMessage(hbMessage)
+			// 设置心跳timer
+			if c.hbInterval > 0 {
+				c.hbTimer.Reset(c.hbInterval)
+			}
 		}
 	}
 }
@@ -138,11 +142,6 @@ func (c *Conn) readCoroutine(ctx context.Context) {
 			if err != nil {
 				c.done <- err
 				continue
-			}
-
-			// 设置心跳timer
-			if c.hbInterval > 0 {
-				c.hbTimer.Reset(c.hbInterval)
 			}
 
 			if msg.GetID() == MsgHeartbeat {
